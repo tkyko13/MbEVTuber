@@ -1,0 +1,140 @@
+<html>
+
+<head>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
+  
+  <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
+    crossorigin="anonymous"></script>
+  <style>
+    .imagePreview {
+      width: 100%;
+      height: 180px;
+      background-position: center center;
+      background-size: cover;
+      -webkit-box-shadow: 0 0 1px 1px rgba(0, 0, 0, .3);
+      display: inline-block;
+    }
+    a {
+      color:black;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+  <form>
+    <br>
+    <h1>皆で作るVTUber</h1>
+
+    <br>
+    <label for="partsSelect">顔の部位を選択</label>
+    <select class="form-control" id="partsSelect">
+      <option>輪郭</option>
+      <option>右目</option>
+      <option>左目</option>
+      <option>口</option>
+      <option>右耳</option>
+      <option>左耳</option>
+      <option>髪</option>
+    </select>
+    <br>
+    <!-- <label for="fileForm">画像を選択</label>
+    <input type="file" class="form-control-file" id="fileForm"> -->
+      <label class="input-group-btn">
+        <span class="btn btn-light">
+          画像選択<input type="file" style="display:none" class="uploadFile">
+          <!-- <input type="text" class="form-control" readonly=""> -->
+        </span>
+      </label>
+      <div class="imagePreview"></div>
+    <br>
+    <br>
+    <button type="submit" class="btn btn-primary mb-2">VTuberに適用</button>
+  </form>
+  <div id="toast1" class="toast" data-delay="3000" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-body">
+      アップロード完了
+    </div>
+  </div>
+
+  <a href="https://github.com/tkyko13/MbEVTuber">
+  <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-github"
+    viewBox="0 0 16 16">
+    <path
+      d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z" />
+  </svg>
+  </a>
+  
+  </div>
+
+  <!-- The core Firebase JS SDK is always required and must be listed first -->
+  <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-storage.js"></script>
+  <!-- TODO: Add SDKs for Firebase products that you want to use
+       https://firebase.google.com/docs/web/setup#available-libraries -->
+  <script src="https://www.gstatic.com/firebasejs/8.3.1/firebase-analytics.js"></script>
+
+  <script>
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCpdhgxEnzN_TkA848aeEaGt77Zwrk-WDU",
+      authDomain: "mbevtuber.firebaseapp.com",
+      projectId: "mbevtuber",
+      storageBucket: "mbevtuber.appspot.com",
+      messagingSenderId: "633781308843",
+      appId: "1:633781308843:web:dd126cf407d2058e1f16ee",
+      measurementId: "G-7B7T3PRQR8"
+    };
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    firebase.analytics();
+
+    //formのsubmitにイベント設定
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      const imgs = form.querySelector('input');
+      const uploads = [];
+      const uploadName = $('#partsSelect').val();
+      console.log(uploadName)
+      for (let file of imgs.files) {
+        //選択したファイルのファイル名を使うが、場合によってはかぶるので注意
+        const storageRef = firebase.storage().ref('form-mdeVTuber/' + uploadName + ".png");
+        uploads.push(storageRef.put(file));
+      }
+      if(imgs.files.length > 0) {
+        //すべての画像のアップロード完了を待つ
+        Promise.all(uploads).then(function () {
+          console.log('アップロード完了');
+          $('#toast1').toast('show');
+        });
+      }
+      
+    });
+
+    $(document).on('change', ':file', function () {
+        var input = $(this),
+          numFiles = input.get(0).files ? input.get(0).files.length : 1,
+          label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+        // input.parent().parent().next(':text').val(label);
+
+        var files = !!this.files ? this.files : [];
+        if (!files.length || !window.FileReader) return; // no file selected, or no FileReader support
+        if (/^image/.test(files[0].type)) { // only image file
+          var reader = new FileReader(); // instance of the FileReader
+          reader.readAsDataURL(files[0]); // read the local file
+          reader.onloadend = function () { // set image data as background of div
+            // input.parent().parent().parent().prev('.imagePreview').css("background-image", "url(" + this.result + ")");
+            $('.imagePreview').css("background-image", "url(" + this.result + ")");
+          }
+        }
+      });
+  </script>
+
+</body>
+
+</html>

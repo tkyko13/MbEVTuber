@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>TEST</title>
+  <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
+  <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-app.js"></script>
+
+  <!-- Add Firebase products that you want to use -->
+  <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase-storage.js"></script>
+</head>
+
+<body>
+  <p>Storageファイル一覧</p>
+  <div id="table"></div>
+  <script>
+    var firebaseConfig = {
+      apiKey: "AIzaSyD5H--oEJ2bC12KGQx0dFlHHVcyJATsJO8",
+      authDomain: "mytest-fffd1.firebaseapp.com",
+      databaseURL: "https://mytest-fffd1.firebaseio.com",
+      projectId: "mytest-fffd1",
+      storageBucket: "mytest-fffd1.appspot.com",
+      messagingSenderId: "539585594918",
+      appId: "1:539585594918:web:69effcba0a5e6afadd08e7"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    // Get a reference to the storage service, which is used to create references in your storage bucket
+    var storage = firebase.storage();
+
+    // Create a storage reference from our storage service
+    var storageRef = storage.ref();
+
+    document.addEventListener('DOMContentLoaded', function () {
+      var table = document.createElement('table');
+      var tableBody = document.createElement("tbody");
+
+      storageRef.listAll().then(function (result) {
+        result.items.forEach(function (ref) {
+          var row = document.createElement("tr");
+          var cell = document.createElement("td");
+          cell.appendChild(document.createTextNode(ref.name));
+          row.appendChild(cell);
+          tableBody.appendChild(row);
+          table.appendChild(tableBody);
+        });
+        document.getElementById("table").appendChild(table);
+      }).catch(function (error) {
+        console.error(error);
+      })
+    });
+  </script>
+</body>
+
+</html>
